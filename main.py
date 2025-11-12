@@ -1,50 +1,47 @@
 """
 Weather Dashboard - Main Entry Point
+Can run in CLI or GUI mode
 """
 
-import json
-from src.dashboard import WeatherDashboard
-from src.alerts import TemperatureAlerts
-from src.analyzer import WeatherAnalyzer
-
-
-def load_cities():
-    """Load cities from the JSON file"""
-    try:
-        with open("data/cities.json", "r") as f:
-            data = json.load(f)
-            return data["cities"]
-    except FileNotFoundError:
-        print("⚠️  cities.json not found. Using default cities.")
-        return ["London", "New York", "Tokyo"]
-    except Exception as e:
-        print(f"⚠️  Error loading cities: {e}")
-        return ["London", "New York", "Tokyo"]
+import sys
+from src.gui import main as gui_main
 
 
 def main():
-    """Main function to run the weather dashboard"""
-    dashboard = WeatherDashboard()
-    alerts_system = TemperatureAlerts(min_temp=15, max_temp=25)
-    analyzer = WeatherAnalyzer(preferred_temp_min=15, preferred_temp_max=25)
+    """Main function - launches GUI by default"""
 
-    # Load cities from config file
-    cities = load_cities()
+    # Check if user wants CLI mode
+    if len(sys.argv) > 1 and sys.argv[1] == "--cli":
+        # Run CLI version
+        from src.dashboard import WeatherDashboard
+        from src.alerts import TemperatureAlerts
+        from src.analyzer import WeatherAnalyzer
+        import json
 
-    # Display full report for the first city
-    dashboard.display_full_report(cities[0])
+        def load_cities():
+            try:
+                with open("data/cities.json", "r") as f:
+                    data = json.load(f)
+                    return data["cities"]
+            except:
+                return ["London", "New York", "Tokyo"]
 
-    # Display temperature alerts
-    alerts_system.display_alerts(cities[0])
+        dashboard = WeatherDashboard()
+        alerts_system = TemperatureAlerts(min_temp=15, max_temp=25)
+        analyzer = WeatherAnalyzer(preferred_temp_min=15, preferred_temp_max=25)
 
-    # Display best day recommendation
-    analyzer.display_best_day_recommendation(cities[0])
+        cities = load_cities()
 
-    # Display comparison for all cities
-    print("\n")
-    dashboard.display_comparison(cities)
+        dashboard.display_full_report(cities[0])
+        alerts_system.display_alerts(cities[0])
+        analyzer.display_best_day_recommendation(cities[0])
 
-    print("\n✨ Thank you for using Weather Dashboard!")
+        print("\n")
+        dashboard.display_comparison(cities)
+        print("\n✨ Thank you for using Weather Dashboard!")
+    else:
+        # Run GUI version (default)
+        gui_main()
 
 
 if __name__ == "__main__":
