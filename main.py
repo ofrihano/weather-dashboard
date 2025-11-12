@@ -5,6 +5,7 @@ Weather Dashboard - Main Entry Point
 import json
 from src.dashboard import WeatherDashboard
 from src.alerts import TemperatureAlerts
+from src.analyzer import WeatherAnalyzer
 
 
 def load_cities():
@@ -25,6 +26,7 @@ def main():
     """Main function to run the weather dashboard"""
     dashboard = WeatherDashboard()
     alerts_system = TemperatureAlerts(min_temp=15, max_temp=25)
+    analyzer = WeatherAnalyzer(preferred_temp_min=15, preferred_temp_max=25)
 
     # Load cities from config file
     cities = load_cities()
@@ -32,8 +34,11 @@ def main():
     # Display full report for the first city
     dashboard.display_full_report(cities[0])
 
-    # Display temperature alerts for the first city
+    # Display temperature alerts
     alerts_system.display_alerts(cities[0])
+
+    # Display best day recommendation
+    analyzer.display_best_day_recommendation(cities[0])
 
     # Display comparison for all cities
     print("\n")
